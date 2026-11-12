@@ -16,6 +16,10 @@ Designed for miners who want clean, native Windows control over XMRig without ke
 * **Plug-and-Play for GUPAX Switchers**: Already have a tuned `config.json`? The installer preserves your settings. Starting fresh without a `config.json`? The installer prompts for your pool URL and wallet/worker name and generates a pre-tuned `config.json` automatically.
 * **Optional Start on Login**: Includes a one-click option to launch XMRig and the system tray icon automatically whenever you sign into Windows.
 
+<img width="356" height="204" alt="XMR_TrayIcon_Hover" src="https://github.com/user-attachments/assets/a7126812-6a7f-4f8f-ac8b-f13c496b7ad0" />
+
+<img width="475" height="305" alt="XMR_TrayIcon_RightClick" src="https://github.com/user-attachments/assets/21f49d0d-fb09-4eaf-9443-23686fd960ec" />
+
 ---
 
 ## 📋 Prerequisites
@@ -37,6 +41,8 @@ Designed for miners who want clean, native Windows control over XMRig without ke
 
 > **Note:** If your XMRig folder does not contain a `config.json` yet, the installer will ask for your **Pool URL** (e.g., `127.0.0.1:3333`) and **Monero Wallet Address / Worker Name**, then generate a ready-to-mine `config.json` automatically.
 
+<img width="543" height="425" alt="XMR_TrayIcon_Installer" src="https://github.com/user-attachments/assets/5adf9444-706a-4564-a618-7db3b7c6890e" />
+
 ---
 
 ## 🖥️ Usage
@@ -51,6 +57,8 @@ While XMRig is running, right-click the **XMRig icon** in your Windows System Tr
 * **View Live Log**: Opens a live-updating terminal window showing XMRig's hashrate, accepted shares, and status.
 * **Switch to X Threads**: Updates `"rx"` thread affinity in `config.json` and restarts XMRig cleanly with the selected thread count. A checkmark (`✓`) indicates the currently active thread profile.
 * **Stop XMRig**: Stops the miner and removes the tray icon.
+
+<img width="1253" height="869" alt="XMR_TrayIcon_Log" src="https://github.com/user-attachments/assets/18791f3d-c212-43a3-ad37-b594327fa0f5" />
 
 ---
 
