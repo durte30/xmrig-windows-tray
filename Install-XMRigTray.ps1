@@ -221,6 +221,7 @@ $BtnInstall.Add_Click({
             'tasklist /FI "IMAGENAME eq xmrig.exe" | find /I "xmrig.exe" >NUL'
             'if %ERRORLEVEL%==0 ('
             '    schtasks.exe /run /tn "StopXMRig" >NUL'
+            '    powershell.exe -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like ''*XMRigTray.ps1*'' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }" >NUL 2>&1'
             '    echo =========================================='
             '    echo   XMRig has been STOPPED.'
             '    echo =========================================='
@@ -238,6 +239,11 @@ $BtnInstall.Add_Click({
         $Ps1Template = @'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+
+$CreatedNew = $false
+$Mutex = New-Object System.Threading.Mutex($true, "Global\XMRigTraySingleInstanceMutex", [ref]$CreatedNew)
+if (-not $CreatedNew) { exit }
+Start-Sleep -Seconds 2
 
 $XmrigDir = $PSScriptRoot
 $XmrigExe = Join-Path $XmrigDir "xmrig.exe"
@@ -327,18 +333,19 @@ $ItemStop.Add_Click({
 $TrayIcon.ContextMenuStrip = $ContextMenu
 Update-MenuState -ActiveCount (Get-ActiveThreadCount)
 
+$AppContext = New-Object System.Windows.Forms.ApplicationContext
 $Timer = New-Object System.Windows.Forms.Timer
 $Timer.Interval = 3000
-$Timer.Add_Click({
+$Timer.Add_Tick({
     if (-not (Get-Process -Name "xmrig" -ErrorAction SilentlyContinue)) {
         $TrayIcon.Visible = $false
         $TrayIcon.Dispose()
         $Timer.Stop()
-        [System.Windows.Forms.Application]::Exit()
+        $AppContext.ExitThread()
     }
 })
 $Timer.Start()
-[System.Windows.Forms.Application]::Run()
+[System.Windows.Forms.Application]::Run($AppContext)
 '@
         $Ps1Content = $Ps1Template.Replace('__THREAD_PROFILES__', $ArrayLiteral)
         [System.IO.File]::WriteAllText((Join-Path $Dir "XMRigTray.ps1"), $Ps1Content)
@@ -347,8 +354,8 @@ $Timer.Start()
             $WshShell = New-Object -ComObject WScript.Shell
             $DesktopPath = [Environment]::GetFolderPath("Desktop")
             $Shortcut = $WshShell.CreateShortcut((Join-Path $DesktopPath "Toggle XMRig.lnk"))
-            $Shortcut.TargetPath = "cmd.exe"
-            $Shortcut.Arguments = "/c `"$BatPath`""
+            $Shortcut.TargetPath = "powershell.exe"
+            $Shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"& '$BatPath'; exit`""
             $Shortcut.WorkingDirectory = $Dir
             $Shortcut.IconLocation = "$ExePath,0"
             $Shortcut.Save()
